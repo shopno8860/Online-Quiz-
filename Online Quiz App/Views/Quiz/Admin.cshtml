@@ -1,0 +1,224 @@
+﻿@model IEnumerable<Online_Quiz_App.Models.Quiz>
+
+<style>
+    body {
+        background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
+        color: #fff;
+    }
+
+    .quiz-panel {
+        background: #ffffff10;
+        border-radius: 10px;
+        padding: 30px;
+        margin: 30px auto;
+        max-width: 1000px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+        .quiz-panel .btn {
+            margin: 4px;
+            padding: 6px 16px;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+
+        .quiz-panel .accordion-button {
+            background-color: #203a43;
+            color: #fff;
+            font-weight: bold;
+        }
+
+            .quiz-panel .accordion-button:not(.collapsed) {
+                background-color: #2c5364;
+            }
+
+        .quiz-panel .accordion-item {
+            border-radius: 5px;
+            overflow: hidden;
+            background-color: #ffffff15;
+            color: #fff;
+        }
+
+        .quiz-panel .list-group-item {
+            background-color: #ffffff08;
+            border: none;
+            color: #fff;
+        }
+
+        .quiz-panel .modal-content {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+</style>
+
+<div class="quiz-panel">
+    <h2 class="mb-4 text-center">Admin Panel</h2>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4>Manage Quizzes</h4>
+        <a href="@Url.Action("Create", "Quiz")" class="btn btn-primary">Add New Quiz</a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="accordion" id="quizAccordion">
+            @foreach (var quiz in Model)
+            {
+                <div class="accordion-item mb-3">
+                    <h2 class="accordion-header" id="heading-@quiz.QuizId">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@quiz.QuizId" aria-expanded="false" aria-controls="collapse-@quiz.QuizId">
+                            @quiz.Title
+                        </button>
+                    </h2>
+                    <div id="collapse-@quiz.QuizId" class="accordion-collapse collapse" aria-labelledby="heading-@quiz.QuizId" data-bs-parent="#quizAccordion">
+                        <div class="accordion-body">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editQuizModal-@quiz.QuizId">Edit Quiz</button>
+                                    <form method="post" asp-action="DeleteQuiz" asp-controller="Quiz" class="d-inline">
+                                        <input type="hidden" name="id" value="@quiz.QuizId" />
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete Quiz</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <ul class="list-group">
+                                @foreach (var question in quiz.Questions)
+                                {
+                                    <li class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span><strong>Q:</strong> @question.Text</span>
+                                            <div>
+                                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editQuestionModal-@question.QuestionId">Edit Question</button>
+                                                <form method="post" asp-action="DeleteQuestion" asp-controller="Quiz" class="d-inline">
+                                                    <input type="hidden" name="id" value="@question.QuestionId" />
+                                                    <button type="submit" class="btn btn-danger btn-sm">Delete Question</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <ul class="mt-2">
+                                            @foreach (var option in question.Options)
+                                            {
+                                                <li>- @option.Text</li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Quiz Modal -->
+                <div class="modal fade" id="editQuizModal-@quiz.QuizId" tabindex="-1" aria-labelledby="editQuizModalLabel-@quiz.QuizId" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editQuizModalLabel-@quiz.QuizId">Edit Quiz</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form method="post" asp-action="UpdateQuiz" asp-controller="Quiz">
+                                <div class="modal-body">
+                                    <input type="hidden" name="QuizId" value="@quiz.QuizId" />
+                                    <div class="mb-3">
+                                        <label for="QuizTitle-@quiz.QuizId" class="form-label">Quiz Title</label>
+                                        <input type="text" class="form-control" id="QuizTitle-@quiz.QuizId" name="Title" value="@quiz.Title" required />
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Question Button -->
+                <div class="text-end mt-3">
+                    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addQuestionModal-@quiz.QuizId">Add Question</button>
+                </div>
+
+                <!-- Add Question Modal -->
+                <div class="modal fade" id="addQuestionModal-@quiz.QuizId" tabindex="-1" aria-labelledby="addQuestionModalLabel-@quiz.QuizId" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form method="post" asp-action="AddQuestion" asp-controller="Quiz">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="addQuestionModalLabel-@quiz.QuizId">Add New Question</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" name="QuizId" value="@quiz.QuizId" />
+                                    <div class="mb-3">
+                                        <label class="form-label">Question Text</label>
+                                        <input type="text" class="form-control" name="Text" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Correct Answer</label>
+                                        <input type="text" class="form-control" name="CorrectAnswer" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Options</label>
+                                        <input type="text" class="form-control mb-2" name="Options[0]" placeholder="Option 1" required />
+                                        <input type="text" class="form-control mb-2" name="Options[1]" placeholder="Option 2" required />
+                                        <input type="text" class="form-control mb-2" name="Options[2]" placeholder="Option 3" required />
+                                        <input type="text" class="form-control mb-2" name="Options[3]" placeholder="Option 4" required />
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Add Question</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Question Modals -->
+                @foreach (var question in quiz.Questions)
+                {
+                    <div class="modal fade" id="editQuestionModal-@question.QuestionId" tabindex="-1" aria-labelledby="editQuestionModalLabel-@question.QuestionId" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="editQuestionModalLabel-@question.QuestionId">Edit Question</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form method="post" asp-action="UpdateQuestionWithOptions" asp-controller="Quiz">
+                                    <div class="modal-body">
+                                        <input type="hidden" name="QuestionId" value="@question.QuestionId" />
+                                        <div class="mb-3">
+                                            <label class="form-label">Question Text</label>
+                                            <input type="text" class="form-control" name="Text" value="@question.Text" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Correct Answer</label>
+                                            <input type="text" class="form-control" name="CorrectAnswer" value="@question.CorrectAnswer" required />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Options</label>
+                                            <input type="text" class="form-control mb-2" name="Options[0]" placeholder="Option 1" required />
+                                            <input type="text" class="form-control mb-2" name="Options[1]" placeholder="Option 2" required />
+                                            <input type="text" class="form-control mb-2" name="Options[2]" placeholder="Option 3" required />
+                                            <input type="text" class="form-control mb-2" name="Options[3]" placeholder="Option 4" required />
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center" role="alert">
+            No quizzes available. Click "Add New Quiz" to create one.
+        </div>
+    }
+</div>

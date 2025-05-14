@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Quiz Result";
+}
+
+<style>
+    body {
+        background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
+        color: #fff;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .result-container {
+        max-width: 600px;
+        margin: auto;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+    }
+
+        .result-container h2 {
+            font-size: 2.5rem;
+            color: #ffeb3b;
+            margin-bottom: 25px;
+        }
+
+        .result-container p {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        .result-container strong {
+            color: #00eaff;
+        }
+
+    .btn-custom {
+        background: linear-gradient(45deg, #00c6ff, #0072ff);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        transition: 0.3s ease;
+    }
+
+        .btn-custom:hover {
+            background: linear-gradient(45deg, #0072ff, #00c6ff);
+            transform: scale(1.05);
+            color: #fff;
+        }
+</style>
+
+<div class="container py-5 text-center">
+    <div class="result-container">
+        <h2>🎉 Quiz Result 🎉</h2>
+        <p>You answered <strong>@ViewBag.CorrectAnswers</strong> out of <strong>@ViewBag.TotalQuestions</strong> questions correctly.</p>
+        <p>Unanswered Questions: <strong>@ViewBag.Unanswered</strong></p>
+        <p class="fs-3">Your Score: <strong>@ViewBag.Score%</strong></p>
+
+        <a href="@Url.Action("Home", "Quiz")" class="btn btn-custom mt-4">🔙 Back to Quizzes</a>
+    </div>
+</div>

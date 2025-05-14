@@ -1,0 +1,173 @@
+﻿@{
+    ViewData["Title"] = "Register";
+}
+<style>
+    body {
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        font-family: 'Segoe UI', sans-serif;
+        color: white;
+    }
+
+    .register-container {
+        max-width: 400px;
+        margin: 60px auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(8px);
+        border-radius: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+    }
+
+        .register-container h2 {
+            font-weight: 700;
+            color: #ffeb3b;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+    .form-label {
+        font-weight: 500;
+        color: #fff;
+    }
+
+    .form-control {
+        border-radius: 6px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid #2a5298;
+        color: #fff;
+    }
+
+        .form-control:focus {
+            border-color: #ffeb3b;
+            box-shadow: 0 0 10px rgba(255, 235, 59, 0.5);
+        }
+
+    .btn-register {
+        background: linear-gradient(90deg, #ffeb3b, #2a5298);
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 12px;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-register:hover {
+            background: linear-gradient(90deg, #2a5298, #ffeb3b);
+            transform: scale(1.05);
+        }
+
+    .alert {
+        border-radius: 8px;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: #ffeb3b;
+    }
+
+    .form-icon {
+        position: absolute;
+        top: 50%;
+        left: 12px;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+
+    .input-group input {
+        padding-left: 36px;
+    }
+
+    .text-center a {
+        text-decoration: none;
+        color: #ffeb3b;
+        font-weight: 600;
+    }
+
+        .text-center a:hover {
+            text-decoration: underline;
+        }
+
+    .register-container .form-text {
+        color: #ddd;
+        font-size: 0.9rem;
+    }
+
+    .register-container .forgot-password {
+        color: #ffeb3b;
+        font-weight: 600;
+    }
+
+        .register-container .forgot-password:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<div class="register-container">
+    <h2><i class="bi bi-person-plus-fill me-2"></i>Register</h2>
+
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+    {
+        <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+    }
+
+    <form asp-action="Registration" method="post" onsubmit="return validatePasswords();">
+        <div class="mb-3">
+            <label for="FullName" class="form-label">Full Name</label>
+            <input type="text" id="FullName" name="FullName" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label for="Email" class="form-label">Email</label>
+            <input type="email" id="Email" name="Email" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label for="Password" class="form-label">Password</label>
+            <input type="password" id="Password" name="Password" class="form-control" required />
+            <div class="form-text">
+                Password must be at least 6 characters, contain 1 uppercase, 1 lowercase, and 1 symbol.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="ConfirmPassword" class="form-label">Confirm Password</label>
+            <input type="password" id="ConfirmPassword" name="ConfirmPassword" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label for="Role" class="form-label">Role</label>
+            <select id="Role" name="Role" class="form-control" required>
+                <option value="">Select Role</option>
+                <option value="Student">Student</option>
+                <option value="Admin">Admin</option>
+            </select>
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-register">Register</button>
+        </div>
+    </form>
+
+    <div class="text-center mt-3">
+        <span>Already have an account?</span> <a asp-action="Login" asp-controller="Authentication" class="text-primary">Login</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function validatePasswords() {
+            var password = document.getElementById('Password').value;
+            var confirmPassword = document.getElementById('ConfirmPassword').value;
+            var regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/;
+
+            if (!regex.test(password)) {
+                alert('Password must be at least 6 characters, contain 1 uppercase, 1 lowercase, and 1 symbol.');
+                return false;
+            }
+            if (password !== confirmPassword) {
+                alert('Passwords do not match.');
+                return false;
+            }
+            return true;
+        }
+    </script>
+}

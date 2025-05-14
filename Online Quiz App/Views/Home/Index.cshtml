@@ -1,0 +1,121 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style>
+    body {
+        background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
+        color: white;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .hero-section {
+        text-align: center;
+        padding: 60px 20px;
+        max-width: 800px;
+        margin: auto;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(8px);
+    }
+
+        .hero-section h1 {
+            font-size: 3.5rem;
+            color: #ffeb3b;
+            margin-bottom: 20px;
+        }
+
+        .hero-section p {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+        }
+
+        .hero-section .btn-custom {
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: 0.3s ease;
+        }
+
+            .hero-section .btn-custom:hover {
+                background: linear-gradient(45deg, #0072ff, #00c6ff);
+                transform: scale(1.05);
+                color: #fff;
+            }
+
+    .info-section {
+        margin-top: 50px;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+
+        .info-section h3 {
+            font-size: 2rem;
+            color: #ffeb3b;
+        }
+
+        .info-section p {
+            margin-top: 20px;
+            color: #ddd;
+        }
+
+        .info-section .info-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            transition: transform 0.3s ease;
+        }
+
+            .info-section .info-card:hover {
+                transform: scale(1.05);
+            }
+
+            .info-section .info-card h5 {
+                color: #00c6ff;
+                font-size: 1.6rem;
+            }
+</style>
+
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1 class="display-4 fw-bold mb-3">🎓 Welcome to QuizZone</h1>
+        <p class="lead mb-4">Test your knowledge, challenge your friends, and master new topics with fun and engaging quizzes!</p>
+        @{
+            var isLoggedIn = Context.Session.GetString("UserEmail") != null;
+            var userRole = Context.Session.GetString("UserRole");
+            string quizUrl = isLoggedIn && userRole == "Student"
+            ? Url.Action("Home", "Quiz")
+            : Url.Action("Login", "Authentication", new { alert = "Please log in first" });
+        }
+        <a href="@quizUrl" class="btn btn-custom mt-4">Start Quiz</a>
+
+    </div>
+
+    <!-- Info Section -->
+    <div class="info-section">
+        <h3>Why Choose QuizZone?</h3>
+        <div class="d-flex justify-content-center gap-5 mt-4">
+            <div class="info-card">
+                <h5>Interactive Quizzes</h5>
+                <p>Engage with quizzes that adapt to your learning style and challenge your intellect.</p>
+            </div>
+            <div class="info-card">
+                <h5>Track Your Progress</h5>
+                <p>Monitor your quiz performance and watch your skills improve over time!</p>
+            </div>
+            <div class="info-card">
+                <h5>Variety of Topics</h5>
+                <p>Explore a wide range of quizzes across multiple subjects and genres.</p>
+            </div>
+        </div>
+    </div>
+</div>

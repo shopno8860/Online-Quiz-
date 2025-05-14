@@ -1,0 +1,65 @@
+﻿@model IEnumerable<Online_Quiz_App.Models.Quiz>
+
+<div class="container py-5">
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h2 class="fw-bold display-5 "><span class="text-white">🎯 Choose a Quiz</span></h2>
+        <p class="text-muted fs-5"><span class="text-white">Sharpen your skills — click a card to begin!</span></p>
+    </div>
+
+    <!-- Quiz Cards -->
+    <div class="row g-4">
+        @foreach (var quiz in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card quiz-card text-white h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex flex-column p-4">
+                        <h5 class="card-title mb-3 fs-4">@quiz.Title</h5>
+                        <p class="card-text mb-4 text-light">🚀 Challenge yourself with this quiz!</p>
+                        <div class="mt-auto">
+                            <a href="@Url.Action("QuizDetails", "Quiz", new { id = quiz.QuizId })"
+                               class="btn custom-btn w-100">
+                                Start Quiz
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+    body {
+        background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+        min-height: 100vh;
+    }
+
+    .quiz-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .quiz-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+    .custom-btn {
+        background: linear-gradient(45deg, #00c9ff, #92fe9d);
+        border: none;
+        font-weight: 600;
+        padding: 10px 20px;
+        border-radius: 30px;
+        color: #000;
+        transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+        .custom-btn:hover {
+            background: linear-gradient(45deg, #92fe9d, #00c9ff);
+            transform: scale(1.05);
+        }
+</style>

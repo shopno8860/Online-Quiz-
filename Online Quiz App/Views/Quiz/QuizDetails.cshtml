@@ -1,0 +1,193 @@
+﻿@model Online_Quiz_App.Models.Quiz
+
+<div class="container py-5">
+    <h2 class="mb-4 text-center text-warning display-5 fw-bold">@Model.Title</h2>
+    <form id="quizForm" method="post" asp-action="SubmitQuiz" asp-controller="Quiz">
+        <input type="hidden" name="QuizId" value="@Model.QuizId" />
+
+        <div id="question-container">
+            @for (int i = 0; i < Model.Questions.Count; i++)
+            {
+                var q = Model.Questions.ElementAt(i);
+                <div class="question-card p-4 mb-5 shadow-lg" data-question-index="@i" style="display:@(i == 0 ? "block" : "none")">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="text-white">Question @(i + 1): @q.Text</h5>
+                        <span class="fw-bold text-warning fs-5" id="timer-@i">10</span>
+                    </div>
+
+                    <input type="hidden" name="Answers[@q.QuestionId]" id="answer-input-@q.QuestionId" />
+
+                    <div class="row">
+                        @for (int j = 0; j < q.Options.Count; j++)
+                        {
+                            var option = q.Options.ElementAt(j);
+                            <div class="col-md-6 mb-3">
+                                <button type="button"
+                                        class="btn option-btn w-100"
+                                        data-question-id="@q.QuestionId"
+                                        data-option-text="@option.Text">
+                                    @option.Text
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <button type="button" id="prevBtn" class="btn btn-outline-light" style="display:none;">Previous</button>
+            <div>
+                <button type="button" id="nextBtn" class="btn btn-warning text-dark fw-bold" style="display:none;">Next</button>
+                <button type="submit" id="submitBtn" class="btn btn-success fw-bold px-4" style="display:none;">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Custom Styling -->
+<style>
+    body {
+        background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
+        color: white;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .question-card {
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .option-btn {
+        font-size: 1rem;
+        font-weight: 600;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        padding: 14px 20px;
+        background: linear-gradient(135deg, #2c5364, #203a43, #0f2027);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+        .option-btn:hover {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Peach to Light Orange Gradient */
+            transform: scale(1.05); /* Slightly bigger scale for more interaction */
+        }
+
+        .option-btn.selected {
+            background: linear-gradient(135deg, #ff7e5f, #feb47b); /* Peach to Light Orange Gradient */
+            box-shadow: 0 0 20px rgba(255, 126, 95, 0.8); /* Soft glowing shadow */
+            color: white;
+            font-weight: 600; /* Bold text when selected */
+        }
+
+
+
+    .btn-outline-light {
+        border-radius: 30px;
+        padding: 10px 25px;
+        font-weight: 600;
+        border: 2px solid #fff;
+        color: #fff;
+    }
+
+        .btn-outline-light:hover {
+            background: #fff;
+            color: #2c5364;
+        }
+
+    .btn-warning {
+        border-radius: 30px;
+        padding: 10px 25px;
+    }
+
+    .btn-success {
+        border-radius: 30px;
+        padding: 10px 25px;
+    }
+</style>
+
+<!-- JavaScript -->
+@section Scripts {
+    <script>
+        let currentQuestion = 0;
+        const totalQuestions = @Model.Questions.Count;
+        let timer = 10;
+        let timerInterval;
+
+        function showQuestion(index) {
+            document.querySelectorAll('.question-card').forEach((el, i) => {
+                el.style.display = (i === index) ? 'block' : 'none';
+            });
+
+            timer = 10;
+            updateTimerDisplay(index, timer);
+
+            if (timerInterval) clearInterval(timerInterval);
+
+            timerInterval = setInterval(() => {
+                timer--;
+                updateTimerDisplay(index, timer);
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    goToNextQuestion();
+                }
+            }, 1000);
+
+            document.getElementById('prevBtn').style.display = (index > 0) ? 'inline-block' : 'none';
+            document.getElementById('nextBtn').style.display = (index < totalQuestions - 1) ? 'inline-block' : 'none';
+            document.getElementById('submitBtn').style.display = (index === totalQuestions - 1) ? 'inline-block' : 'none';
+        }
+
+        function updateTimerDisplay(index, time) {
+            const timerEl = document.getElementById(`timer-${index}`);
+            if (timerEl) timerEl.textContent = time;
+        }
+
+        function goToNextQuestion() {
+            if (currentQuestion < totalQuestions - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            } else {
+                document.getElementById('quizForm').submit();
+            }
+        }
+
+        function goToPreviousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', function () {
+            clearInterval(timerInterval);
+            goToNextQuestion();
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', function () {
+            clearInterval(timerInterval);
+            goToPreviousQuestion();
+        });
+
+        document.querySelectorAll('.option-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const questionId = this.dataset.questionId;
+                const optionText = this.dataset.optionText;
+
+                document.getElementById(`answer-input-${questionId}`).value = optionText;
+
+                document.querySelectorAll(`.option-btn[data-question-id="${questionId}"]`).forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+
+                this.classList.add('selected');
+            });
+        });
+
+        showQuestion(currentQuestion);
+    </script>
+}
